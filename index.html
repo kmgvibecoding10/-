@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Опрос о профессиональном выгорании</title>
+<meta name="description" content="Анонимный опросник для самооценки профессионального выгорания сотрудников: CBI, BAT-12, WHO-5.">
+<style>
+:root{
+  --bg:#f6f7f9;--card:#fff;--text:#1d2430;--muted:#5b6575;--line:#e0e4ea;--accent:#2f6fed;--accent-t:#fff;
+  --g:#2e9e5b;--gbg:#e6f5ec;--y:#c98a00;--ybg:#fff4d6;--o:#d9610f;--obg:#ffe9db;--r:#c62828;--rbg:#fde4e4;
+  --shadow:0 1px 3px rgba(20,30,50,.08),0 4px 14px rgba(20,30,50,.05);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#12161c;--card:#1b212a;--text:#e8ecf2;--muted:#9aa5b5;--line:#2c3541;--accent:#6b9bff;--accent-t:#0d1320;
+  --g:#5ccb8a;--gbg:#17301f;--y:#f0b73a;--ybg:#3a2f12;--o:#ff9a55;--obg:#3b2415;--r:#ff7b7b;--rbg:#3a1a1a;--shadow:none;
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+a{color:var(--accent)}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;flex-wrap:wrap}
+.brand{font-weight:700;text-decoration:none;color:var(--text)}
+nav a{margin-left:14px;text-decoration:none;color:var(--muted);font-size:15px;padding:8px 0;display:inline-block}
+nav a:hover,nav a.on{color:var(--accent)}
+main{padding:24px 0 48px;min-height:70vh}
+h1{font-size:2rem;line-height:1.2;margin:.2em 0 .5em}
+h2{font-size:1.4rem;margin:1.4em 0 .5em}
+h3{font-size:1.1rem;margin:1.2em 0 .4em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:16px 0;box-shadow:var(--shadow)}
+.btn{display:inline-block;border:0;border-radius:10px;padding:14px 22px;min-height:48px;font:inherit;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-t);text-decoration:none}
+.btn.sec{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,.opt:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+.notice{border-left:5px solid var(--accent);background:var(--card);padding:14px 16px;border-radius:8px;margin:16px 0}
+.anon{background:var(--gbg);border:1px solid var(--g);border-radius:14px;padding:18px 20px;margin:20px 0;font-size:1.05rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.draft{background:var(--ybg);border:1px dashed var(--y);border-radius:8px;padding:10px 14px;font-size:.9rem;margin:12px 0}
+/* survey */
+.prog{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 18px}
+.prog>i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.q{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;background:var(--card)}
+.q.err{border-color:var(--r);background:var(--rbg)}
+.q .t{font-weight:600;margin-bottom:10px;display:flex;gap:8px;align-items:flex-start}
+.q .num{color:var(--muted);font-weight:400;min-width:2.2em}
+.hint-btn{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:50%;width:26px;height:26px;cursor:pointer;flex:none;font-weight:700}
+.hint{font-size:.9rem;color:var(--muted);margin:-4px 0 10px 2.2em}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{flex:1 1 150px;position:relative}
+.opt input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.opt span{display:block;text-align:center;border:1.5px solid var(--line);border-radius:10px;padding:11px 8px;min-height:46px;font-size:.95rem;cursor:pointer}
+.opt input:checked+span{background:var(--accent);color:var(--accent-t);border-color:var(--accent);font-weight:600}
+.err-msg{color:var(--r);font-size:.9rem;display:none;margin-top:6px}
+.q.err .err-msg{display:block}
+label.fld{display:block;margin:14px 0 4px;font-weight:600}
+select,textarea,input[type=text]{width:100%;font:inherit;padding:11px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--text)}
+textarea{min-height:100px;resize:vertical}
+.chk{display:flex;gap:12px;align-items:flex-start;margin:16px 0}
+.chk input{width:24px;height:24px;margin-top:3px;flex:none}
+/* results */
+.zone{display:inline-block;border-radius:999px;padding:3px 12px;font-weight:700;font-size:.9rem}
+.z-g{background:var(--gbg);color:var(--g)}.z-y{background:var(--ybg);color:var(--y)}.z-o{background:var(--obg);color:var(--o)}.z-r{background:var(--rbg);color:var(--r)}
+.bar{position:relative;height:16px;border-radius:8px;margin:14px 0 6px;background:linear-gradient(90deg,var(--g) 0 49.5%,var(--y) 49.5% 74.5%,var(--o) 74.5% 99.5%,var(--r) 99.5%);opacity:.85}
+.bar.b3{background:linear-gradient(90deg,var(--g) 0 33.3%,var(--y) 33.3% 66.6%,var(--r) 66.6%)}
+.bar .mk{position:absolute;top:-6px;width:6px;height:28px;border-radius:3px;background:var(--text);transform:translateX(-50%);border:2px solid var(--card)}
+.scale{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted)}
+.pill-row{display:grid;grid-template-columns:minmax(150px,230px) 1fr auto;gap:10px;align-items:center;margin:10px 0}
+@media(max-width:560px){.pill-row{grid-template-columns:1fr}}
+.recs li{margin:6px 0}
+.help-box{background:var(--obg);border:1px solid var(--o);border-radius:14px;padding:18px 20px;margin:16px 0}
+.code{font:700 1.6rem/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:14px 18px;display:inline-block}
+details{border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:10px 0;background:var(--card)}
+summary{cursor:pointer;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+td,th{border:1px solid var(--line);padding:8px 10px;text-align:left}
+footer{border-top:1px solid var(--line);background:var(--card);padding:18px 0;font-size:.92rem;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sr{position:absolute;left:-9999px}
+/* ---- краски и визуализация ---- */
+:root{--p:#7c4dff;--t:#12a5a0;--pk:#e8508a;--h1:#2f6fed;--h2:#7c4dff;--tint1:#eaf1ff;--tint2:#f1ebff;--tint3:#e1f6f4;--tint4:#ffeaf2}
+@media (prefers-color-scheme:dark){:root{--p:#a68bff;--t:#4fd1c5;--pk:#ff7eb0;--tint1:#17233d;--tint2:#241d3d;--tint3:#12302e;--tint4:#3a1a28}}
+.hero{position:relative;overflow:hidden;border-radius:20px;padding:34px 28px;margin:0 0 20px;color:#fff;background:linear-gradient(135deg,#2f6fed 0%,#7c4dff 55%,#e8508a 100%)}
+.hero h1{margin:0 0 .4em;font-size:2.1rem}
+.hero p{max-width:520px;margin:0 0 1em;opacity:.95}
+.hero .btn{background:#fff;color:#4a35c9}
+.hero .btn.sec{background:transparent;color:#fff;border-color:#fff}
+.hero svg.art{position:absolute;right:-30px;bottom:-30px;width:300px;opacity:.28;pointer-events:none}
+.feat{border-radius:16px;padding:18px;border:1px solid var(--line)}
+.feat .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:24px;margin-bottom:10px;color:#fff}
+.f1{background:var(--tint1)}.f1 .ic{background:linear-gradient(135deg,#2f6fed,#6b9bff)}
+.f2{background:var(--tint2)}.f2 .ic{background:linear-gradient(135deg,#7c4dff,#b39bff)}
+.f3{background:var(--tint3)}.f3 .ic{background:linear-gradient(135deg,#12a5a0,#4fd1c5)}
+.steps{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.steps .st{flex:1 1 150px;display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.steps .n{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;flex:none}
+.stepper{display:flex;gap:6px;margin:6px 0 16px}
+.stepper i{flex:1;height:8px;border-radius:6px;background:var(--line)}
+.stepper i.on{background:var(--ac,var(--accent))}
+.stepper i.cur{box-shadow:0 0 0 3px color-mix(in srgb,var(--ac,var(--accent)) 30%,transparent)}
+.phead{border-radius:16px;padding:18px 20px;margin:8px 0 16px;color:#fff;background:var(--grad)}
+.phead h1{margin:0;font-size:1.5rem}.phead p{margin:.4em 0 0;opacity:.95}
+.opt:hover span{border-color:var(--ac,var(--accent))}
+.opt input:checked+span{background:var(--ac,var(--accent))}
+.q{border-left:5px solid var(--ac,var(--accent))}
+.sum{border-radius:18px;padding:22px;margin:16px 0;display:flex;gap:22px;align-items:center;flex-wrap:wrap;border:1px solid var(--line)}
+.sum.zg{background:var(--gbg)}.sum.zy{background:var(--ybg)}.sum.zr{background:var(--rbg)}
+.sum h2{margin:0 0 .3em}
+.rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:14px 0}
+.ringbox{text-align:center;border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--card)}
+.ringbox .lb{font-size:.85rem;color:var(--muted);margin-top:4px}
+.ring text{font-family:inherit}
+.card.c1{border-top:5px solid #2f6fed}.card.c2{border-top:5px solid #7c4dff}.card.c3{border-top:5px solid #12a5a0}.card.c4{border-top:5px solid #e8508a}
+.radar{display:block;margin:6px auto;max-width:340px;width:100%}
+.legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+.legend b{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.bar{height:18px;border-radius:9px;opacity:1}
+@media print{header.top,footer,.no-print,.hint-btn{display:none!important}body{background:#fff;color:#000}.card{box-shadow:none;break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#/">Опрос о выгорании</a>
+    <nav aria-label="Основное меню">
+      <a href="#/" data-r="">Главная</a>
+      <a href="#/library" data-r="library">Рекомендации</a>
+      <a href="#/help" data-r="help">Помощь</a>
+      <a href="#/about" data-r="about">О методиках</a>
+      <a href="#/my" data-r="my">Мои результаты</a>
+      <a href="#/hr" data-r="hr">HR</a>
+    </nav>
+  </div>
+</header>
+<main><div class="wrap" id="app"></div></main>
+<footer>
+  <div class="wrap">
+    <span>Результат — самооценка, а не диагноз.</span>
+    <span>Нужна помощь? Экстренный номер <strong>112</strong> · <a href="#/help">Где получить помощь</a></span>
+  </div>
+</footer>
+
+<script>
+"use strict";
+/* ============ НАСТРОЙКИ (в продукте — админ-панель, п. AD-3) ============ */
+const CONFIG = {
+  showComparison: true, // пилот: блок сравнения методик (AD-4)
+  // Пороговые значения BAT-12 (общеевропейские, проверить по руководству BAT 2020). Для России норм нет.
+  bat: {
+    total: {risk: 2.59, high: 3.02},
+    EX: {risk: 2.59, high: 3.02},
+    MD: {risk: 2.59, high: 3.02},
+    CI: {risk: 2.59, high: 3.02},
+    EI: {risk: 2.59, high: 3.02}
+  },
+  minGroup: 5
+};
+
+/* ============ ВОПРОСЫ ============ */
+const FREQ = [["Всегда",100],["Часто",75],["Иногда",50],["Редко",25],["Никогда / почти никогда",0]];
+const DEG  = [["В очень высокой степени",100],["В высокой степени",75],["В некоторой степени",50],["В низкой степени",25],["В очень низкой степени",0]];
+const DEGR = [["В очень высокой степени",0],["В высокой степени",25],["В некоторой степени",50],["В низкой степени",75],["В очень низкой степени",100]];
+const BATS = [["Никогда",1],["Редко",2],["Иногда",3],["Часто",4],["Всегда",5]];
+const WHOS = [["Всё время",5],["Большую часть времени",4],["Больше половины времени",3],["Меньше половины времени",2],["Иногда",1],["Ни разу",0]];
+
+const PARTS = [
+ {id:"P", title:"Часть 1. Ваше общее самочувствие", intro:"Вспомните, как вы себя чувствовали в последнее время. Отвечайте, как есть, правильных и неправильных ответов нет.", items:[
+  ["P1","Как часто вы чувствуете усталость?",FREQ,"Любая усталость — и физическая, и моральная"],
+  ["P2","Как часто вы чувствуете физическое истощение?",FREQ,"Когда тело «без сил», даже если вы ничего тяжёлого не делали"],
+  ["P3","Как часто вы чувствуете эмоциональное истощение?",FREQ,"Когда нет сил на эмоции, всё раздражает или безразлично"],
+  ["P4","Как часто вы думаете: «Я больше не могу»?",FREQ,"Ощущение, что ресурс закончился"],
+  ["P5","Как часто вы чувствуете себя изнурённым?",FREQ,"Состояние «выжатого лимона»"],
+  ["P6","Как часто вы чувствуете слабость и уязвимость к болезням?",FREQ,"Частые простуды, ощущение, что организм «сдаёт»"]]},
+ {id:"W", title:"Часть 2. Вы и ваша работа", intro:"Теперь подумайте о работе: как она влияет на ваши силы и настроение.", items:[
+  ["W1","Изматывает ли вас работа эмоционально?",DEG,"Насколько работа забирает эмоциональные силы"],
+  ["W2","Чувствуете ли вы, что выгораете из-за работы?",DEG,"Ваше собственное ощущение, без оценки «правильности»"],
+  ["W3","Вызывает ли работа у вас раздражение и чувство безысходности?",DEG,"Ощущение, что усилия не приносят результата"],
+  ["W4","Как часто вы чувствуете себя измотанным в конце рабочего дня?",FREQ],
+  ["W5","Как часто утром вы чувствуете усталость при мысли о предстоящем рабочем дне?",FREQ],
+  ["W6","Как часто вы чувствуете, что каждый рабочий час даётся вам с трудом?",FREQ],
+  ["W7","Хватает ли у вас сил на семью и друзей в свободное время?",DEGR,"Обратная шкала, пересчитывается автоматически"]]},
+ {id:"B", title:"Часть 3. Как вы чувствуете себя на работе в последнее время", intro:"Оцените, как часто вы замечаете у себя следующее на работе.",
+  draft:"РАБОЧИЙ ПЕРЕВОД. Тексты BAT-12 нужно заменить дословным текстом официальной русской версии (burnoutassessmenttool.be) после получения от авторов.", items:[
+  ["B1","На работе я чувствую себя психически истощённым(ой)",BATS],
+  ["B2","Всё, что я делаю на работе, требует от меня больших усилий",BATS],
+  ["B3","После рабочего дня мне трудно восстановить силы",BATS],
+  ["B4","Мне трудно найти в себе энтузиазм к работе",BATS],
+  ["B5","На работе я испытываю сильное отвращение к своей работе",BATS],
+  ["B6","Мне безразлична моя работа",BATS],
+  ["B7","На работе мне трудно сохранять концентрацию",BATS],
+  ["B8","На работе мне трудно ясно мыслить",BATS],
+  ["B9","Я допускаю ошибки в работе, потому что мои мысли заняты другим",BATS],
+  ["B10","На работе я не могу контролировать свои эмоции",BATS],
+  ["B11","Я не узнаю себя в том, как эмоционально реагирую на работе",BATS],
+  ["B12","Я могу непреднамеренно слишком остро отреагировать",BATS]]},
+ {id:"H", title:"Часть 4. Ваше настроение за последние 2 недели", intro:"Выберите вариант, который лучше всего описывает ваше самочувствие за последние 2 недели.",
+  draft:"РАБОЧИЙ ПЕРЕВОД. Нужно использовать официальный русский текст WHO-5 без изменений.", items:[
+  ["H1","Я чувствовал(а) себя бодрым(ой) и в хорошем настроении",WHOS],
+  ["H2","Я чувствовал(а) себя спокойным(ой) и расслабленным(ой)",WHOS],
+  ["H3","Я чувствовал(а) себя активным(ой) и энергичным(ой)",WHOS],
+  ["H4","Я просыпался(лась) свежим(ей) и отдохнувшим(ей)",WHOS],
+  ["H5","Моя повседневная жизнь была наполнена интересными для меня занятиями",WHOS]]}
+];
+const OPEN_Q = ["Что сильнее всего забирает ваши силы на работе?","Что могла бы изменить компания, чтобы вам стало легче?"];
+const DEMO = [
+  ["dept","Отдел / направление",["Отдел 1","Отдел 2","Отдел 3","Отдел 4"],"Список отделов задаётся в админ-панели"],
+  ["tenure","Стаж в компании",["До 1 года","1–3 года","3–5 лет","Более 5 лет"]],
+  ["format","Формат работы",["Офис","Удалённо","Смешанный"]],
+  ["lead","Руководящая должность",["Да","Нет"]]
+];
+
+/* ============ ТЕКСТЫ РЕЗУЛЬТАТОВ (черновик — проверяет клинический психолог, п. 5.3) ============ */
+const LEVELS = [ // CBI
+  {max:49, name:"Низкий", z:"g", zone:1},
+  {max:74, name:"Умеренный", z:"y", zone:2},
+  {max:99, name:"Высокий", z:"o", zone:3},
+  {max:100, name:"Очень высокий", z:"r", zone:3}];
+const ZNAME = {1:"Зелёная зона",2:"Жёлтая зона",3:"Красная зона"};
+const ZCLS = {1:"g",2:"y",3:"r"};
+const CBI_TXT = {
+  P:{title:"Личное выгорание (общая усталость)",
+    t:["Усталость сейчас в пределах обычного. Это хороший запас, который стоит беречь.",
+       "Усталость заметна и накапливается. Пока это ранний этап, на котором восстановление идёт быстрее всего.",
+       "Силы на исходе: усталость стала постоянным фоном. Организму нужно восстановление, а не ещё одно усилие.",
+       "Ресурс практически исчерпан. Это сигнал, что нужна поддержка, а не повод винить себя."]},
+  W:{title:"Выгорание, связанное с работой",
+    t:["Работа пока не забирает больше сил, чем отдаёт. Важно сохранить границы между работой и отдыхом.",
+       "Работа заметно утомляет. Стоит присмотреться, что именно в ней забирает больше всего сил.",
+       "Работа сильно истощает вас. Без изменений нагрузки или условий восстановиться будет трудно.",
+       "Связь усталости с работой очень сильная. Желательно обсудить нагрузку и обратиться за поддержкой."]}
+};
+const BAT_TXT = {
+  total:{title:"Общий уровень выгорания (BAT-12)",
+    t:["Признаков выгорания по общему баллу нет.","Есть признаки повышенного риска выгорания. Это хороший момент, чтобы внести изменения.","Высокий риск выгорания. Рекомендуем не откладывать меры и обсудить состояние со специалистом."]},
+  EX:{title:"Истощение",means:"сильная нехватка физических и психических сил",
+    t:["Запас сил в норме.","Сил становится заметно меньше, чем нужно для обычных дел.","Выраженная нехватка сил: восстановление после работы почти не происходит."]},
+  MD:{title:"Психологическая дистанция",means:"отстранённость, потеря интереса к работе",
+    t:["Интерес к работе сохраняется.","Появляется отстранённость и снижается интерес к работе.","Выраженная отстранённость: работа вызывает безразличие или отторжение."]},
+  CI:{title:"Когнитивные нарушения",means:"трудности с концентрацией и вниманием",
+    t:["С концентрацией и памятью всё в порядке.","Иногда трудно сосредоточиться и ясно мыслить.","Выраженные трудности с вниманием и мышлением, растёт риск ошибок."]},
+  EI:{title:"Эмоциональные нарушения",means:"трудности с контролем эмоций",
+    t:["Эмоции под контролем.","Чаще бывают раздражительность и сильные реакции.","Выраженные трудности с контролем эмоций: вспышки, слёзы, раздражение."]}
+};
+const REC = { // рекомендации по ключу + срок
+  EX:[["week","Запланируйте в календаре два вечера без рабочих сообщений на этой неделе."],["week","Ложитесь спать в одно и то же время минимум 4 дня подряд."],["month","Обсудите с руководителем распределение задач и реалистичные сроки."],["month","Возьмите хотя бы несколько выходных подряд без рабочей почты."]],
+  MD:[["week","Выпишите 3 дела на работе, которые приносили вам удовлетворение раньше."],["month","Попросите у руководителя или коллег обратную связь по проекту, который вам важен."],["month","Найдите в текущих задачах одну, которая связана с вашими сильными сторонами."]],
+  CI:[["week","Выделите 2 блока по 60–90 минут без уведомлений и встреч для сложной работы."],["week","Делайте 5-минутную паузу каждый час и не открывайте в это время телефон."],["month","Ведите список «одна главная задача на день» вместо многозадачности."]],
+  EI:[["week","Когда замечаете раздражение, сделайте паузу в 10 дыханий, прежде чем ответить."],["month","Договоритесь с руководителем о способе, как сообщать о перегрузке до срыва."],["month","Найдите безопасный способ выпускать напряжение: прогулки, спорт, разговор с близкими."]],
+  P:[["week","Каждый день выходите на 20-минутную прогулку на улице."],["month","Запишитесь на плановый осмотр к терапевту: усталость может иметь физические причины."]],
+  W:[["week","Завершайте рабочий день ритуалом: запишите, что осталось на завтра, и закройте рабочие программы."],["month","Составьте список задач, которые можно отказаться брать, делегировать или перенести."]],
+  H:[["week","Выберите одно занятие, которое вам приятно, и запланируйте его на ближайшие дни."]]
+};
+const WHO_TXT = [
+  {name:"Благополучие в норме",txt:"Ваше общее самочувствие за последние две недели находится в хорошем диапазоне. Продолжайте то, что помогает вам восстанавливаться."},
+  {name:"Сниженное благополучие",txt:"Ваше самочувствие за последние две недели немного ниже обычного. Рекомендуем обратить внимание на сон, отдых и при необходимости обратиться к психологу или терапевту."},
+  {name:"Низкое благополучие",txt:"Ваше самочувствие за последние две недели заметно снижено, и это может быть связано с депрессивным состоянием. Это поддаётся лечению. Мы мягко, но настойчиво рекомендуем обратиться к специалисту (психолог, психотерапевт, терапевт)."}
+];
+
+const LIB = [
+ ["Восстановление и сон","Сон — основа восстановления. Старайтесь ложиться и вставать в одно время, за час до сна уберите экраны, проветрите комнату. Если проблемы со сном длятся более 2–3 недель, обратитесь к терапевту или неврологу."],
+ ["Нагрузка и личные границы","Границы — это договорённости о том, когда вы доступны. Определите время, после которого не отвечаете на рабочие сообщения, и сообщите об этом коллегам. Начните с малого: два вечера в неделю."],
+ ["Как поговорить с руководителем о нагрузке","Придите с фактами: список задач, сроки, сколько времени занимает каждая. Предложите варианты: что перенести, что делегировать, что убрать. Говорите о результате работы, а не о своих чувствах «вообще»."],
+ ["Концентрация, многозадачность и паузы","Многозадачность снижает продуктивность. Работайте блоками по 60–90 минут с перерывами, отключайте уведомления, начинайте день с самой важной задачи."],
+ ["Как справляться с раздражительностью и эмоциями","Замечайте ранние сигналы в теле: напряжение, учащённое дыхание. Сделайте паузу, дышите медленно, откройте окно, выйдите из комнаты. Отвечайте после паузы, а не сразу."],
+ ["Отдых, отпуск и переключение","Отдых работает, когда вы действительно отключаетесь от работы. Планируйте отпуск заранее, а в течение недели оставляйте время на занятия, не связанные с работой."],
+ ["Как вернуть интерес к работе","Вспомните, что нравилось раньше. Ищите задачи, где вы видите результат. Просите обратную связь. Если интерес пропал надолго, подумайте, что стоит изменить в роли или проекте."],
+ ["Как выбрать психолога","Обратите внимание на профильное образование, участие в супервизии и следование этическому кодексу. Спросите о подходе и формате на первой встрече. Не обязательно соглашаться на первого специалиста. Психотерапевта можно получить по ОМС через поликлинику."]
+];
+
+/* ============ УТИЛИТЫ ============ */
+const $ = s=>document.querySelector(s);
+const app = $("#app");
+const mem = {s:{},l:{}};
+function mk(area,m){return {
+  get(k,d){try{const v=window[area].getItem(k);if(v)return JSON.parse(v)}catch(e){}return k in m?JSON.parse(m[k]):d},
+  set(k,v){const j=JSON.stringify(v);m[k]=j;try{window[area].setItem(k,j)}catch(e){}}
+}}
+const store = mk("sessionStorage",mem.s);
+const lstore = mk("localStorage",mem.l);
+function state(){return store.get("st",{consent:false,demo:{},ans:{},open:{},fb:{},part:0,link:""})}
+function save(s){store.set("st",s)}
+async function sha(t){
+  if(!(window.crypto&&crypto.subtle)){let h=5381;for(const c of t)h=((h<<5)+h+c.charCodeAt(0))>>>0;return "x"+h}
+  const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+function genCode(){const a="АБВГДЕЖКМНПРСТУФХЦЧШЭЮЯ23456789";const g=()=>Array.from({length:3},()=>a[Math.floor(Math.random()*a.length)]).join("");return g()+"-"+g()+"-"+g()}
+const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const r1=n=>Math.round(n*10)/10;
+const normCode=c=>c.toUpperCase().replace(/[^A-ZА-ЯЁ0-9]/g,"");
+
+/* ============ РАСЧЁТЫ ============ */
+function cbiLevel(v){return LEVELS.find(l=>v<=l.max)}
+function batZone(v,key){const c=CONFIG.bat[key];return v>=c.high?3:v>=c.risk?2:1}
+function compute(ans){
+  const val=(id,scale)=>scale.find(o=>o[0]===ans[id])[1];
+  const sc={};
+  const P=PARTS[0].items.map(i=>val(i[0],i[2])), W=PARTS[1].items.map(i=>val(i[0],i[2]));
+  sc.P=avg(P); sc.W=avg(W);
+  const B=PARTS[2].items.map(i=>val(i[0],i[2]));
+  sc.EX=avg(B.slice(0,3)); sc.MD=avg(B.slice(3,6)); sc.CI=avg(B.slice(6,9)); sc.EI=avg(B.slice(9,12)); sc.BAT=avg(B);
+  const H=PARTS[3].items.reduce((s,i)=>s+val(i[0],i[2]),0);
+  sc.WHO=H*4;
+  const lp=cbiLevel(sc.P), lw=cbiLevel(sc.W);
+  const cbiZone=Math.max(lp.zone,lw.zone);
+  const bz={total:batZone(sc.BAT,"total"),EX:batZone(sc.EX,"EX"),MD:batZone(sc.MD,"MD"),CI:batZone(sc.CI,"CI"),EI:batZone(sc.EI,"EI")};
+  const whoLvl=sc.WHO>50?0:sc.WHO>=29?1:2;
+  return {sc,lp,lw,cbiZone,bz,batZone:bz.total,overall:Math.max(cbiZone,bz.total),whoLvl,t:Date.now()};
+}
+
+/* ============ РОУТЕР ============ */
+const routes={"":home,consent,demo,survey,open:openQ,results,library:lib,help,about,my,hr};
+function render(h){
+  document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("on",a.dataset.r===h));
+  try{(routes[h]||home)()}catch(e){console.error(e);app.innerHTML="<h1>Ошибка</h1><p>"+e.message+"</p>"}
+  window.scrollTo(0,0);
+}
+function route(){render((location.hash.replace(/^#\/?/,"")||"").split("?")[0])}
+function go(h){render(h);try{history.pushState(null,"","#/"+h)}catch(e){}}
+window.addEventListener("hashchange",route);
+window.addEventListener("popstate",route);
+document.addEventListener("click",e=>{
+  const a=e.target.closest&&e.target.closest('a[href^="#/"]');
+  if(!a)return;
+  e.preventDefault();go(a.getAttribute("href").replace(/^#\/?/,""));
+});
+
+/* ============ СТРАНИЦЫ ============ */
+function home(){
+  app.innerHTML=`
+  <section class="hero">
+    <svg class="art" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="90" fill="none" stroke="#fff" stroke-width="10"/><circle cx="100" cy="100" r="60" fill="none" stroke="#fff" stroke-width="10" opacity=".7"/><circle cx="100" cy="100" r="30" fill="#fff"/></svg>
+    <h1>Как вы себя чувствуете на работе?</h1>
+    <p>Профессиональное выгорание — это состояние длительной усталости из-за работы: не хватает сил, пропадает интерес, труднее сосредоточиться и справляться с эмоциями. Чем раньше его заметить, тем проще восстановиться.</p>
+    <div class="row"><a class="btn" href="#/consent">Начать опрос →</a><a class="btn sec" href="#/my">Уже проходили? По коду</a></div>
+  </section>
+  <div class="grid">
+    <div class="feat f1"><div class="ic">📊</div><strong>Личный результат</strong><br><span class="muted">Баллы по шкалам, понятное объяснение и цветовая зона.</span></div>
+    <div class="feat f2"><div class="ic">🧭</div><strong>План действий</strong><br><span class="muted">Что сделать на этой неделе, в течение месяца и когда обратиться за помощью.</span></div>
+    <div class="feat f3"><div class="ic">⏱️</div><strong>30 вопросов</strong><br><span class="muted">Около 10–12 минут. Можно пройти с телефона.</span></div>
+  </div>
+  <h2>Как это работает</h2>
+  <div class="steps">
+    <div class="st"><span class="n" style="background:#2f6fed">1</span><span>Согласие и общие сведения</span></div>
+    <div class="st"><span class="n" style="background:#7c4dff">2</span><span>4 короткие части опроса</span></div>
+    <div class="st"><span class="n" style="background:#12a5a0">3</span><span>Результат и рекомендации</span></div>
+    <div class="st"><span class="n" style="background:#e8508a">4</span><span>Код для повторного опроса</span></div>
+  </div>
+  <div class="anon"><strong>🔒 Анонимно.</strong> Ваши личные ответы видите только вы. Компания получает только общую статистику по группам от 5 человек.</div>
+  <p class="muted small">Это не медицинский инструмент: результат — самооценка, а не диагноз.</p>`;
+}
+
+function consent(){
+  const s=state();
+  app.innerHTML=`
+  <h1>Согласие и конфиденциальность</h1>
+  <div class="draft">ЧЕРНОВИК. Текст согласия и политики обработки данных должен быть согласован с юристом до запуска (152-ФЗ).</div>
+  <div class="card">
+    <h3 style="margin-top:0">Какие данные собираются</h3>
+    <ul>
+      <li>Ответы на вопросы опросника и (по желанию) отдел, стаж, формат работы, наличие руководящей должности.</li>
+      <li>Имя, e-mail, табельный номер и IP-адрес <strong>не собираются</strong>. Ответы хранятся под случайным идентификатором.</li>
+    </ul>
+    <h3>Кто видит</h3>
+    <ul>
+      <li>Личный результат видите только вы, по персональному коду.</li>
+      <li>HR видит только обобщённые данные по группам не менее 5 человек.</li>
+    </ul>
+    <h3>Срок хранения</h3>
+    <p>Индивидуальные ответы — до 3 лет (предложение). Вы можете удалить свои результаты по персональному коду.</p>
+    <div class="notice"><strong>Важно:</strong> результат — самооценка, а не диагноз. Он не используется для оценки вашей эффективности.</div>
+    <label class="chk"><input type="checkbox" id="ok" ${s.consent?"checked":""}><span>Я прочитал(а) информацию и согласен(на) на обработку обезличенных ответов в описанном виде.</span></label>
+    <button class="btn" id="go" ${s.consent?"":"disabled"}>Продолжить</button>
+  </div>`;
+  $("#ok").onchange=e=>{$("#go").disabled=!e.target.checked};
+  $("#go").onclick=()=>{const s=state();s.consent=true;save(s);go("demo")};
+}
+
+function demo(){
+  const s=state(); if(!s.consent){go("consent");return}
+  app.innerHTML=`
+  <h1>Общие сведения</h1>
+  <p class="muted">Необязательно. Эти данные нужны только для общей статистики. Группы меньше ${CONFIG.minGroup} человек объединяются с другими.</p>
+  <div class="card">
+    ${DEMO.map(([k,t,o,h])=>`<label class="fld" for="d_${k}">${t}</label>
+      <select id="d_${k}"><option value="">Предпочитаю не указывать</option>${o.map(x=>`<option ${s.demo[k]===x?"selected":""}>${x}</option>`).join("")}</select>
+      ${h?`<div class="muted small">${h}</div>`:""}`).join("")}
+    <h3>Вы уже проходили опрос?</h3>
+    <label class="fld" for="link">Персональный код (чтобы связать результаты и увидеть динамику)</label>
+    <input type="text" id="link" placeholder="например, К7М-4ПВ-9ТХ" value="${s.link||""}" autocomplete="off">
+    <div class="row" style="margin-top:20px"><a class="btn sec" href="#/consent">Назад</a><button class="btn" id="go">К опросу</button></div>
+  </div>`;
+  $("#go").onclick=()=>{const s=state();DEMO.forEach(([k])=>s.demo[k]=$("#d_"+k).value);s.link=$("#link").value.trim();s.part=0;save(s);go("survey")};
+}
+
+function qHtml(it,n,ans){
+  const [id,text,scale,hint]=it;
+  return `<div class="q" id="q_${id}" role="radiogroup" aria-labelledby="t_${id}">
+    <div class="t" id="t_${id}"><span class="num">${n}.</span><span style="flex:1">${text}</span>${hint?`<button type="button" class="hint-btn" data-h="${id}" aria-label="Пояснение">?</button>`:""}</div>
+    ${hint?`<div class="hint" id="h_${id}" hidden>${hint}</div>`:""}
+    <div class="opts">${scale.map(o=>`<label class="opt"><input type="radio" name="${id}" value="${o[0]}" ${ans[id]===o[0]?"checked":""}><span>${o[0]}</span></label>`).join("")}</div>
+    <div class="err-msg">Выберите ответ, чтобы продолжить</div></div>`;
+}
+
+function survey(){
+  const s=state(); if(!s.consent){go("consent");return}
+  const p=s.part, P=PARTS[p];
+  const done=PARTS.slice(0,p).reduce((a,x)=>a+x.items.length,0), total=PARTS.reduce((a,x)=>a+x.items.length,0);
+  const pct=Math.round(done/total*100);
+  const ACS=[["#2f6fed","#6b9bff"],["#7c4dff","#b39bff"],["#12a5a0","#4fd1c5"],["#e8508a","#ff9ac0"]], ac=ACS[p];
+  app.innerHTML=`
+  <div style="--ac:${ac[0]};--grad:linear-gradient(135deg,${ac[0]},${ac[1]})">
+  <div class="muted small">Часть ${p+1} из 4 · ${pct}%</div>
+  <div class="stepper" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100">${[0,1,2,3].map(i=>`<i class="${i<=p?"on":""} ${i===p?"cur":""}" style="--ac:${ACS[i][0]}"></i>`).join("")}</div>
+  <div class="phead"><h1>${P.title}</h1><p>${P.intro}</p></div>
+  ${P.draft?`<div class="draft">${P.draft}</div>`:""}
+  <div id="qs">${P.items.map((it,i)=>qHtml(it,i+1,s.ans)).join("")}</div>
+  <div class="row" style="margin-top:20px"><button class="btn sec" id="back">Назад</button><button class="btn" id="next" style="background:${ac[0]}">${p<3?"Далее →":"Продолжить →"}</button></div></div>`;
+  document.querySelectorAll(".hint-btn").forEach(b=>b.onclick=()=>{const h=$("#h_"+b.dataset.h);h.hidden=!h.hidden});
+  document.querySelectorAll("#qs input").forEach(i=>i.onchange=()=>{const s=state();s.ans[i.name]=i.value;save(s);$("#q_"+i.name).classList.remove("err")});
+  $("#back").onclick=()=>{const s=state();if(s.part>0){s.part--;save(s);survey();window.scrollTo(0,0)}else go("demo")};
+  $("#next").onclick=()=>{
+    const s=state();let first=null;
+    P.items.forEach(it=>{const bad=!s.ans[it[0]];$("#q_"+it[0]).classList.toggle("err",bad);if(bad&&!first)first=it[0]});
+    if(first){$("#q_"+first).scrollIntoView({behavior:"smooth",block:"center"});return}
+    if(s.part<3){s.part++;save(s);survey();window.scrollTo(0,0)}else{save(s);go("open")}
+  };
+}
+
+function openQ(){
+  const s=state(); if(!PARTS.every(P=>P.items.every(i=>s.ans[i[0]]))){go("survey");return}
+  app.innerHTML=`
+  <div class="prog"><i style="width:100%"></i></div>
+  <h1>Последние вопросы</h1>
+  <div class="notice">Не указывайте имена и детали, по которым вас можно узнать. Ответы необязательны (до 1000 символов).</div>
+  ${OPEN_Q.map((q,i)=>`<label class="fld" for="o${i}">${q}</label><textarea id="o${i}" maxlength="1000">${s.open[i]||""}</textarea>`).join("")}
+  <h3>О сайте</h3>
+  <label class="fld" for="fb1">Насколько понятен ваш результат? (оценим после просмотра, необязательно)</label>
+  <select id="fb1"><option value="">Пропустить</option>${[1,2,3,4,5].map(n=>`<option ${s.fb.clear==n?"selected":""}>${n}</option>`).join("")}</select>
+  <label class="fld" for="fb2">Вы доверяете анонимности опроса?</label>
+  <select id="fb2"><option value="">Пропустить</option><option ${s.fb.trust==="Да"?"selected":""}>Да</option><option ${s.fb.trust==="Нет"?"selected":""}>Нет</option></select>
+  <div class="row" style="margin-top:20px"><button class="btn sec" id="back">Назад</button><button class="btn" id="fin">Получить результат</button></div>`;
+  $("#back").onclick=()=>{const s=state();s.part=3;save(s);go("survey")};
+  $("#fin").onclick=async()=>{
+    const s=state();
+    s.open={0:$("#o0").value,1:$("#o1").value};s.fb={clear:$("#fb1").value,trust:$("#fb2").value};
+    const r=compute(s.ans);
+    // персональный код: новый или связанный с прошлым прохождением
+    let code=s.link&&normCode(s.link)?s.link.toUpperCase():genCode();
+    const key=await sha(normCode(code));
+    const db=lstore.get("results",{});
+    (db[key]=db[key]||[]).push({t:r.t,sc:r.sc,overall:r.overall,whoLvl:r.whoLvl,cbiZone:r.cbiZone,batZone:r.batZone});
+    lstore.set("results",db);
+    store.set("last",{r,code});
+    // очистка ответов сессии
+    save({consent:true,demo:{},ans:{},open:{},fb:{},part:0,link:""});
+    go("results");
+  };
+}
+
+function bar(v,max,cls){return `<div class="bar ${cls||""}" role="img" aria-label="Значение ${r1(v)} из ${max}"><i class="mk" style="left:${Math.min(100,Math.max(0,v/max*100))}%"></i></div>`}
+const ZCOL={1:"var(--g)",2:"var(--y)",3:"var(--r)"};
+function ring(v,max,col,label,sub,size){
+  size=size||120;const R=size/2-12,C=2*Math.PI*R,f=Math.min(1,Math.max(0,v/max));
+  return `<svg class="ring" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="${label}: ${label==="Баллы"?"":""}${sub}">
+   <circle cx="${size/2}" cy="${size/2}" r="${R}" fill="none" stroke="var(--line)" stroke-width="12"/>
+   <circle cx="${size/2}" cy="${size/2}" r="${R}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C*f} ${C}" transform="rotate(-90 ${size/2} ${size/2})"/>
+   <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-size="${size/4.4}" font-weight="700" fill="currentColor">${sub}</text></svg>`;
+}
+function radar(vals,labels,cols){
+  const S=300,c=S/2,R=95,n=vals.length,ang=i=>-Math.PI/2+i*2*Math.PI/n,pt=(i,f)=>[c+Math.cos(ang(i))*R*f,c+Math.sin(ang(i))*R*f];
+  const poly=f=>vals.map((_,i)=>pt(i,f).join(",")).join(" ");
+  const data=vals.map((v,i)=>pt(i,Math.min(1,Math.max(0,(v-1)/4))).join(",")).join(" ");
+  return `<svg class="radar" viewBox="0 0 ${S} ${S}" role="img" aria-label="Профиль выгорания BAT-12">
+   ${[.25,.5,.75,1].map(f=>`<polygon points="${poly(f)}" fill="none" stroke="currentColor" opacity=".15"/>`).join("")}
+   ${vals.map((_,i)=>`<line x1="${c}" y1="${c}" x2="${pt(i,1)[0]}" y2="${pt(i,1)[1]}" stroke="currentColor" opacity=".15"/>`).join("")}
+   <polygon points="${data}" fill="#7c4dff" fill-opacity=".25" stroke="#7c4dff" stroke-width="2.5"/>
+   ${vals.map((v,i)=>{const p=pt(i,Math.min(1,Math.max(0,(v-1)/4)));return `<circle cx="${p[0]}" cy="${p[1]}" r="6" fill="${cols[i]}" stroke="var(--card)" stroke-width="2"/>`}).join("")}
+   ${labels.map((l,i)=>{const p=pt(i,1.2),a=p[0]<c-5?"end":p[0]>c+5?"start":"middle";return `<text x="${p[0]}" y="${p[1]}" text-anchor="${a}" dominant-baseline="central" font-size="11" fill="currentColor">${l}</text>`}).join("")}
+  </svg>`;
+}
+
+function results(){
+  const L=store.get("last");
+  if(!L){app.innerHTML=`<h1>Результаты</h1><p>Пока нет результатов. <a href="#/consent">Пройти опрос</a> или <a href="#/my">посмотреть по коду</a>.</p>`;return}
+  const {r,code}=L, sc=r.sc;
+  const cbiRows=[["P",sc.P,r.lp],["W",sc.W,r.lw]];
+  const subs=["EX","MD","CI","EI"];
+  // самые высокие шкалы для плана действий
+  const rank=[["P",r.lp.zone+sc.P/1000],["W",r.lw.zone+sc.W/1000],...subs.map(k=>[k,r.bz[k]+sc[k]/100])].sort((a,b)=>b[1]-a[1]);
+  const top=rank.slice(0,2).map(x=>x[0]);
+  const topName=k=>k==="P"?"общая усталость":k==="W"?"усталость от работы":BAT_TXT[k].title.toLowerCase();
+  const plan={week:[],month:[]};
+  top.forEach(k=>REC[k].forEach(([w,t])=>{if(plan[w].length<3)plan[w].push(t)}));
+  if(!plan.week.length)plan.week.push(...REC.H.map(x=>x[1]));
+  const gen={1:"Сейчас признаков выгорания по основным шкалам нет. Это хороший момент, чтобы закрепить привычки, которые помогают вам восстанавливаться.",
+    2:`Ваш уровень усталости выше среднего. Заметнее всего выражено: ${topName(top[0])}. Это ранний этап, на котором восстановление идёт быстрее всего. Ниже — что именно стоит сделать.`,
+    3:`Результаты показывают высокий уровень выгорания. Больше всего выражено: ${topName(top[0])}. Это не вина и не слабость, а сигнал, что ресурсы на исходе. Ниже — шаги, которые помогут, и контакты тех, кто может поддержать.`};
+  const zc=ZCLS[r.overall];
+  const whoBlock=`<div class="help-box"><strong>${WHO_TXT[r.whoLvl].name}</strong><p>${WHO_TXT[r.whoLvl].txt}</p>
+    <p class="small">Экстренная помощь: <strong>112</strong>. <a href="#/help">Все контакты и как выбрать специалиста</a></p></div>`;
+  const cmp=CONFIG.showComparison?`<div class="card"><h2 style="margin-top:0">Сравнение методик</h2>
+    <p>${r.cbiZone===r.batZone?"Результаты двух методик согласуются, оценка надёжная.":"Методики измеряют выгорание немного по-разному: CBI больше смотрит на усталость, BAT учитывает также концентрацию и эмоции. Ориентируйтесь на более высокий результат."}</p>
+    <p class="muted small">CBI: ${ZNAME[r.cbiZone]} · BAT-12: ${ZNAME[r.batZone]}</p></div>`:"";
+  app.innerHTML=`
+  <h1>Ваш результат</h1>
+  ${r.whoLvl===2?whoBlock:""}
+  <div class="sum z${zc}">
+    ${ring(r.overall,3,ZCOL[r.overall],"Зона",["","🙂","😐","😟"][r.overall],130)}
+    <div style="flex:1;min-width:240px"><h2>Общий вывод <span class="zone z-${zc}">${ZNAME[r.overall]}</span></h2>
+    <p>${gen[r.overall]}</p>
+    <p class="muted small" style="margin:0">Результат — самооценка, а не диагноз.</p></div></div>
+
+  <div class="rings">
+    <div class="ringbox">${ring(sc.P,100,ZCOL[r.lp.zone],"CBI личное",Math.round(sc.P))}<div class="lb">CBI: личное · ${r.lp.name}</div></div>
+    <div class="ringbox">${ring(sc.W,100,ZCOL[r.lw.zone],"CBI работа",Math.round(sc.W))}<div class="lb">CBI: работа · ${r.lw.name}</div></div>
+    <div class="ringbox">${ring(sc.BAT-1,4,ZCOL[r.bz.total],"BAT-12",r1(sc.BAT))}<div class="lb">BAT-12 · ${["","нет риска","повышенный риск","высокий риск"][r.bz.total]}</div></div>
+    <div class="ringbox">${ring(sc.WHO,100,r.whoLvl===0?"var(--g)":r.whoLvl===1?"var(--y)":"var(--r)","WHO-5",Math.round(sc.WHO))}<div class="lb">WHO-5 · ${WHO_TXT[r.whoLvl].name.toLowerCase()}</div></div>
+  </div>
+
+  <div class="card c1"><h2 style="margin-top:0">Копенгагенский опросник (CBI)</h2>
+  ${cbiRows.map(([k,v,l])=>`<h3>${CBI_TXT[k].title}: ${Math.round(v)} из 100 <span class="zone z-${l.z}">${l.name}</span></h3>
+    ${bar(v,100)}<div class="scale"><span>0</span><span>50</span><span>75</span><span>100</span></div>
+    <p>${CBI_TXT[k].t[LEVELS.indexOf(l)]}</p>
+    <ul class="recs">${REC[k].map(x=>`<li>${x[1]}</li>`).join("")}</ul>`).join("")}</div>
+
+  <div class="card c2"><h2 style="margin-top:0">BAT-12</h2>
+    <h3>Общий балл: ${r1(sc.BAT)} из 5 <span class="zone z-${ZCLS[r.bz.total]}">${["","Нет риска","Повышенный риск","Высокий риск"][r.bz.total]}</span></h3>
+    ${bar((sc.BAT-1)/4*100,100,"b3")}
+    <p>${BAT_TXT.total.t[r.bz.total-1]}</p>
+    <h3>Профиль выгорания</h3>
+    ${radar(subs.map(k=>sc[k]),["Истощение","Дистанция","Концентрация","Эмоции"],subs.map(k=>ZCOL[r.bz[k]]))}
+    <div class="legend"><span><b style="background:var(--g)"></b>нет риска</span><span><b style="background:var(--y)"></b>повышенный</span><span><b style="background:var(--r)"></b>высокий</span></div>
+    ${subs.map(k=>`<div class="pill-row"><span>${BAT_TXT[k].title}</span>${bar((sc[k]-1)/4*100,100,"b3")}<span><b>${r1(sc[k])}</b> <span class="zone z-${ZCLS[r.bz[k]]}">${["","Нет риска","Повышенный риск","Высокий риск"][r.bz[k]]}</span></span></div>`).join("")}
+    ${subs.map(k=>`<p><strong>${BAT_TXT[k].title}</strong> (${BAT_TXT[k].means}). ${BAT_TXT[k].t[r.bz[k]-1]}</p>`).join("")}
+    <p class="muted small">Пороги основаны на европейских нормах; российских норм нет.</p></div>
+
+  ${cmp}
+
+  ${r.whoLvl<2?`<div class="card c3"><h2 style="margin-top:0">Благополучие (WHO-5): ${Math.round(sc.WHO)} из 100</h2>${bar(sc.WHO,100)}<p><strong>${WHO_TXT[r.whoLvl].name}.</strong> ${WHO_TXT[r.whoLvl].txt}</p></div>`:`<div class="card c3"><h2 style="margin-top:0">Благополучие (WHO-5): ${Math.round(sc.WHO)} из 100</h2><p>Тревожных значений нет, но обратите внимание на рекомендации выше.</p></div>`}
+
+  <div class="card c3"><h2 style="margin-top:0">Ваш план действий</h2>
+    <h3>На этой неделе</h3><ul class="recs">${plan.week.map(t=>`<li>${t}</li>`).join("")}</ul>
+    ${plan.month.length?`<h3>В течение месяца</h3><ul class="recs">${plan.month.map(t=>`<li>${t}</li>`).join("")}</ul>`:""}
+    <h3>Если через 4–6 недель не станет лучше</h3>
+    <ul class="recs"><li>Обратитесь к терапевту, чтобы исключить физические причины усталости.</li><li>Запишитесь к психологу или психотерапевту (<a href="#/library">как выбрать</a>).</li></ul>
+    <p class="small">Подробнее: <a href="#/library">библиотека рекомендаций</a>.</p></div>
+
+  <div class="card c4"><h2 style="margin-top:0">Когда нужна помощь</h2>
+    <p>Обратитесь к специалисту, если вы замечаете:</p>
+    <ul><li>стойкое снижение настроения более 2 недель;</li><li>нарушения сна;</li><li>потерю интереса ко всему;</li><li>мысли о бессмысленности жизни.</li></ul>
+    <p>Экстренный номер: <strong>112</strong>. <a href="#/help">Где получить помощь</a>.</p></div>
+
+  <div class="card no-print"><h2 style="margin-top:0">Ваш персональный код</h2>
+    <div class="code" id="codev">${code}</div>
+    <p>Сохраните код, чтобы позже вернуться к результатам и сравнить их при повторном прохождении. Восстановить его нельзя.</p>
+    <p class="muted small">Результаты сохранены только в этом браузере.</p>
+    <div class="row"><button class="btn sec" id="cp">Скопировать код</button><button class="btn sec" id="pdf">Скачать результат (PDF)</button><button class="btn sec" id="ics">Напомнить через 3 месяца (.ics)</button></div></div>`;
+  $("#cp").onclick=async e=>{try{await navigator.clipboard.writeText(code);e.target.textContent="Скопировано"}catch(x){e.target.textContent="Выделите и скопируйте вручную"}};
+  $("#pdf").onclick=()=>window.print();
+  $("#ics").onclick=()=>{
+    const d=new Date();d.setMonth(d.getMonth()+3);
+    const f=n=>String(n).padStart(2,"0"), ds=d.getFullYear()+f(d.getMonth()+1)+f(d.getDate());
+    const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Burnout survey//RU","BEGIN:VEVENT","UID:"+Date.now()+"@burnout-survey","DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z","DTSTART;VALUE=DATE:"+ds,"SUMMARY:Пройти опрос о выгорании повторно","DESCRIPTION:Откройте сайт опроса и введите свой персональный код.","END:VEVENT","END:VCALENDAR"].join("\r\n");
+    const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([ics],{type:"text/calendar"}));a.download="remind.ics";a.click();
+  };
+}
+
+function lib(){
+  app.innerHTML=`<h1>Библиотека рекомендаций</h1><p class="muted">Короткие материалы, на которые ссылаются результаты опроса.</p>`+
+  LIB.map((a,i)=>`<details ${i===0?"open":""}><summary>${i+1}. ${a[0]}</summary><p>${a[1]}</p></details>`).join("");
+}
+
+function help(){
+  app.innerHTML=`<h1>Где получить помощь</h1>
+  <div class="help-box"><strong>Экстренная помощь: 112</strong><p style="margin:.4em 0 0">Если вам или кому-то рядом угрожает опасность, звоните немедленно.</p></div>
+  <div class="draft">ЧЕРНОВИК. Телефоны доверия для взрослых (федеральные и по регионам присутствия компании) добавить и проверять перед запуском и раз в квартал.</div>
+  <div class="card"><h2 style="margin-top:0">Психологическая помощь</h2>
+    <ul><li>Как выбрать психолога: образование, супервизия, этический кодекс (<a href="#/library">статья</a>).</li>
+    <li>Онлайн-сервисы подбора специалистов.</li>
+    <li>Психотерапевт по ОМС: запись через поликлинику по месту жительства.</li></ul></div>
+  <div class="card"><h2 style="margin-top:0">Медицинский путь</h2>
+    <p>Усталость, бессонница и головные боли могут иметь физическую причину. Обратитесь к терапевту или неврологу, особенно если симптомы держатся больше 2–3 недель.</p></div>
+  <div class="card"><h2 style="margin-top:0">Возможности компании</h2>
+    <p class="muted">Раздел будет заполнен, если компания подключит психолога в ДМС или внешнюю службу поддержки.</p></div>`;
+}
+
+function about(){
+  app.innerHTML=`<h1>О методиках и FAQ</h1>
+  <div class="card"><h3 style="margin-top:0">CBI — Копенгагенский опросник выгорания</h3><p>Авторы: Kristensen T.S. и др., 2005, Национальный институт гигиены труда Дании. Измеряет личное выгорание и выгорание, связанное с работой.</p>
+  <h3>BAT-12 — Burnout Assessment Tool</h3><p>Авторы: Schaufeli W.B., De Witte H., Desart S. Измеряет 4 аспекта: истощение, психологическую дистанцию, когнитивные и эмоциональные нарушения. <strong>Пороговые значения основаны на европейских нормах, российских норм нет.</strong></p>
+  <h3>WHO-5</h3><p>Индекс благополучия ВОЗ. Измеряет общее психологическое благополучие за последние 2 недели.</p>
+  <p class="muted small">Тексты вопросов — рабочий перевод, подлежащий замене на утверждённые русские версии.</p></div>
+  <h2>Частые вопросы</h2>
+  <details open><summary>Узнает ли руководитель мои ответы?</summary><p>Нет. Личные ответы видите только вы по персональному коду. Компания получает только статистику по группам от ${CONFIG.minGroup} человек.</p></details>
+  <details><summary>Это диагноз?</summary><p>Нет. Это самооценка. Диагноз может поставить только врач.</p></details>
+  <details><summary>Что будет с результатами?</summary><p>Индивидуальные ответы хранятся в обезличенном виде в течение срока, указанного в политике. Вы можете удалить свои результаты по коду.</p></details>
+  <details><summary>Зачем вопросы об отделе и стаже?</summary><p>Только для общей статистики. Группы меньше ${CONFIG.minGroup} человек объединяются с другими. Эти вопросы необязательны.</p></details>
+  <details><summary>Почему вопросы повторяются?</summary><p>В пилоте сравниваются две методики выгорания (CBI и BAT-12). После пилота останется одна, и опрос станет короче.</p></details>
+  <details><summary>Как часто проходить опрос?</summary><p>Примерно раз в 3 месяца, чтобы видеть динамику.</p></details>`;
+}
+
+function my(){
+  app.innerHTML=`<h1>Мои результаты</h1>
+  <div class="card"><label class="fld" for="c" style="margin-top:0">Персональный код</label>
+  <input type="text" id="c" placeholder="например, К7М-4ПВ-9ТХ" autocomplete="off">
+  <div class="row" style="margin-top:16px"><button class="btn" id="show">Показать</button></div>
+  <div id="out"></div></div>`;
+  const tries=[];
+  $("#show").onclick=async()=>{
+    const now=Date.now();while(tries.length&&now-tries[0]>60000)tries.shift();
+    if(tries.length>=5){$("#out").innerHTML=`<p class="notice">Слишком много попыток. Подождите минуту.</p>`;return}
+    tries.push(now);
+    const key=await sha(normCode($("#c").value)), db=lstore.get("results",{}), list=db[key];
+    if(!list){$("#out").innerHTML=`<p class="notice">Результатов с таким кодом не найдено в этом браузере.</p>`;return}
+    $("#out").innerHTML=`<h2>Прохождений: ${list.length}</h2>
+    <table><thead><tr><th>Дата</th><th>Зона</th><th>CBI-личное</th><th>CBI-работа</th><th>BAT-12</th><th>WHO-5</th></tr></thead><tbody>
+    ${list.map(x=>`<tr><td>${new Date(x.t).toLocaleDateString("ru-RU")}</td><td><span class="zone z-${ZCLS[x.overall]}">${ZNAME[x.overall]}</span></td><td>${Math.round(x.sc.P)}</td><td>${Math.round(x.sc.W)}</td><td>${r1(x.sc.BAT)}</td><td>${Math.round(x.sc.WHO)}</td></tr>`).join("")}</tbody></table>
+    ${list.length>1?chart(list)+whoChange(list):`<p class="muted">Пройдите опрос повторно, чтобы увидеть динамику.</p>`}
+    <div class="row" style="margin-top:20px"><button class="btn sec" id="del">Удалить мои результаты</button></div>`;
+    const d=$("#del");if(d)d.onclick=()=>{if(confirm("Удалить все результаты по этому коду?")){delete db[key];lstore.set("results",db);$("#out").innerHTML=`<p class="notice">Результаты удалены.</p>`}};
+  };
+}
+function whoChange(l){const d=l[l.length-1].sc.WHO-l[l.length-2].sc.WHO;return Math.abs(d)>=10?`<p class="notice">Индекс WHO-5 изменился на ${d>0?"+":""}${Math.round(d)} пунктов. Это значимое изменение.</p>`:""}
+function chart(list){
+  const W=600,H=220,pad=34,series=[["P","Личное (CBI)","#2f6fed",x=>x.sc.P],["W","Работа (CBI)","#d9610f",x=>x.sc.W],["B","BAT-12","#8e44ad",x=>(x.sc.BAT-1)/4*100],["H","WHO-5","#2e9e5b",x=>x.sc.WHO]];
+  const n=list.length,X=i=>pad+(n===1?0:i*(W-2*pad)/(n-1)),Y=v=>H-pad-v/100*(H-2*pad);
+  return `<h3>Динамика (0–100)</h3><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="График динамики">
+   ${[0,50,100].map(v=>`<line x1="${pad}" x2="${W-pad}" y1="${Y(v)}" y2="${Y(v)}" stroke="currentColor" opacity=".15"/><text x="4" y="${Y(v)+4}" font-size="11" fill="currentColor">${v}</text>`).join("")}
+   ${series.map(([,,c,f])=>`<polyline fill="none" stroke="${c}" stroke-width="2.5" points="${list.map((x,i)=>X(i)+","+Y(f(x))).join(" ")}"/>${list.map((x,i)=>`<circle cx="${X(i)}" cy="${Y(f(x))}" r="4" fill="${c}"/>`).join("")}`).join("")}
+   ${list.map((x,i)=>`<text x="${X(i)}" y="${H-10}" font-size="11" text-anchor="middle" fill="currentColor">${new Date(x.t).toLocaleDateString("ru-RU")}</text>`).join("")}
+  </svg><div class="row small">${series.map(([,t,c])=>`<span><b style="color:${c}">●</b> ${t}</span>`).join("")}</div>
+  <p class="muted small">BAT-12 пересчитан из шкалы 1–5 в 0–100 для графика.</p>`;
+}
+
+function hr(){
+  app.innerHTML=`<h1>Кабинет HR</h1>
+  <div class="card"><p>Кабинет HR и админ-панель требуют серверной части: вход по логину, паролю и двухфакторной аутентификации, общая база ответов и хранение на серверах в РФ.</p>
+  <p>В этой статической версии данные хранятся только в браузере сотрудника, поэтому агрегированной статистики нет.</p>
+  <h3>Что будет в кабинете (по PRD)</h3>
+  <ul><li>Сводка: участие, средние баллы, распределение по зонам, доля WHO-5 ≤ 50 и ≤ 28.</li>
+  <li>Разрезы по отделам, стажу, формату работы, тепловая карта.</li>
+  <li>Профиль BAT по компании, сравнение методик (пилот), динамика по волнам.</li>
+  <li>Открытые ответы с тегами, рекомендации для компании, экспорт PDF/Excel.</li>
+  <li>Правило анонимности: цифры только для групп от ${CONFIG.minGroup} человек.</li></ul></div>`;
+}
+
+route();
+</script>
+</body>
+</html>
